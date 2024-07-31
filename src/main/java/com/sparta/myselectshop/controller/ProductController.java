@@ -3,8 +3,10 @@ package com.sparta.myselectshop.controller;
 import com.sparta.myselectshop.dto.ProductMypriceRequestDto;
 import com.sparta.myselectshop.dto.ProductRequestDto;
 import com.sparta.myselectshop.dto.ProductResponseDto;
+import com.sparta.myselectshop.security.UserDetailsImpl;
 import com.sparta.myselectshop.service.ProductService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -18,8 +20,8 @@ public class ProductController {
 
     // 상품 담기
     @PostMapping("/products")
-    public ProductResponseDto cteateProduct(@RequestBody ProductRequestDto requestDto) {
-        return productService.createProduct(requestDto);
+    public ProductResponseDto cteateProduct(@RequestBody ProductRequestDto requestDto, @AuthenticationPrincipal UserDetailsImpl userDetails) {
+        return productService.createProduct(requestDto, userDetails.getUser());
     }
 
     // 상품 최저가 가격 설정
@@ -28,9 +30,15 @@ public class ProductController {
         return productService.updateProduct(id, requestDto);
     }
 
-
+    // 유저 전용 찜하기 목록
     @GetMapping("/products")
+    public List<ProductResponseDto> getAllProducts(@AuthenticationPrincipal UserDetailsImpl userDetails) {
+        return productService.getProducts(userDetails.getUser());
+    }
+    
+    // 관리자 전용 찜하기 목록
+    @GetMapping("/admin/products")
     public List<ProductResponseDto> getAllProducts() {
-        return productService.getProducts();
+        return productService.getAllProducts();
     }
 }

@@ -49,7 +49,8 @@ public class ProductService {
 
         return new ProductResponseDto(product);
     }
-    
+
+    @Transactional(readOnly = true)
     // 해당 유저에 해당하는 찜하기 제품만 가져옴
     public Page<ProductResponseDto> getProducts(User user, int page, int size, String sortBy, boolean isAsc) {
         Sort.Direction direction = isAsc ? Sort.Direction.ASC : Sort.Direction.DESC;

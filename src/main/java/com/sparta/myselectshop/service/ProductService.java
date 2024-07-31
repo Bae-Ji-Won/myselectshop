@@ -16,9 +16,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -105,5 +102,20 @@ public class ProductService {
         }
 
         productFolderRepository.save(new ProductFolder(product,folder));
+    }
+
+    // 폴더마다 안에 들어있는 제품 리스트 출력
+    public Page<ProductResponseDto> getProductsInFolder(Long folderId, int page, int size, String sortBy, boolean isAsc, User user) {
+
+        Sort.Direction direction = isAsc ? Sort.Direction.ASC : Sort.Direction.DESC;
+        Sort sort = Sort.by(direction, sortBy);
+        Pageable pageable = PageRequest.of(page,size,sort);
+
+        // 해당 유저의 제품 폴더 리스트 안에 특정 폴더의 데이터 추출
+        Page<Product> productList = productRepository.findAllByUserAndProductFolderList_FolderId(user,folderId,pageable);
+
+        Page<ProductResponseDto> responseDtoList = productList.map(ProductResponseDto::new);
+
+        return responseDtoList;
     }
 }
